@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog dos Amigos</title>
 </head>
 <body>
@@ -25,15 +26,18 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
         import {
             getFirestore,
             collection,
             addDoc,
-            getDocs
+            getDocs,
+            query,
+            orderBy
         } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDQbmWakp_rtLyl-3lLQy-CUoI8RUVAEBE",
+            apiKey: "SUA_API_KEY",
             authDomain: "huntrixx-project.firebaseapp.com",
             projectId: "huntrixx-project",
             storageBucket: "huntrixx-project.firebasestorage.app",
@@ -54,8 +58,8 @@
                 return;
             }
 
-            const titulo = document.getElementById("titulo").value;
-            const conteudo = document.getElementById("conteudo").value;
+            const titulo = document.getElementById("titulo").value.trim();
+            const conteudo = document.getElementById("conteudo").value.trim();
 
             if (!titulo || !conteudo) {
                 alert("Preencha todos os campos.");
@@ -74,17 +78,28 @@
         };
 
         async function carregarPosts() {
-            const snapshot = await getDocs(collection(db, "posts"));
+            const q = query(
+                collection(db, "posts"),
+                orderBy("data", "desc")
+            );
+
+            const snapshot = await getDocs(q);
 
             const div = document.getElementById("posts");
+
+            div.innerHTML = "";
 
             snapshot.forEach(doc => {
                 const post = doc.data();
 
+                const dataFormatada = post.data
+                    ? new Date(post.data).toLocaleString("pt-BR")
+                    : "Data desconhecida";
+
                 div.innerHTML += `
                     <h2>${post.titulo}</h2>
                     <p>${post.conteudo}</p>
-                    <p>${post.data}</p>
+                    <small>${dataFormatada}</small>
                     <hr>
                 `;
             });
