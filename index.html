@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog dos Amigos</title>
+</head>
+<body>
+
+    <h1>Blog dos Amigos</h1>
+
+    <input id="chave" type="password" placeholder="Chave secreta">
+    <br><br>
+
+    <input id="titulo" placeholder="Título do post">
+    <br><br>
+
+    <textarea id="conteudo" placeholder="Escreva algo..." rows="5" cols="40"></textarea>
+    <br><br>
+
+    <button onclick="publicar()">Publicar</button>
+
+    <hr>
+
+    <div id="posts"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQbmWakp_rtLyl-3lLQy-CUoI8RUVAEBE",
+            authDomain: "huntrixx-project.firebaseapp.com",
+            projectId: "huntrixx-project",
+            storageBucket: "huntrixx-project.firebasestorage.app",
+            messagingSenderId: "207651890154",
+            appId: "1:207651890154:web:2619523aff9ae6175f8893"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const CHAVE = "HUNTRIXX2026";
+
+        window.publicar = async function () {
+            const chave = document.getElementById("chave").value;
+
+            if (chave !== CHAVE) {
+                alert("Chave incorreta!");
+                return;
+            }
+
+            const titulo = document.getElementById("titulo").value;
+            const conteudo = document.getElementById("conteudo").value;
+
+            if (!titulo || !conteudo) {
+                alert("Preencha todos os campos.");
+                return;
+            }
+
+            await addDoc(collection(db, "posts"), {
+                titulo,
+                conteudo,
+                data: new Date().toISOString()
+            });
+
+            alert("Post publicado!");
+
+            location.reload();
+        };
+
+        async function carregarPosts() {
+            const snapshot = await getDocs(collection(db, "posts"));
+
+            const div = document.getElementById("posts");
+
+            snapshot.forEach(doc => {
+                const post = doc.data();
+
+                div.innerHTML += `
+                    <h2>${post.titulo}</h2>
+                    <p>${post.conteudo}</p>
+                    <hr>
+                `;
+            });
+        }
+
+        carregarPosts();
+    </script>
+
+</body>
+</html>
