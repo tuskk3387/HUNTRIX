@@ -1,37 +1,168 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog dos Amigos</title>
+    <title>HUNTRIXX Blog</title>
+
     <style>
-        .Post {
-            color : blue;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #cbd5e1;
+        }
+
+        .formulario {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        #posts {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .Post {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .Post h2 {
+            color: #93c5fd;
+            margin-bottom: 10px;
+        }
+
+        .Post .autor {
+            color: #cbd5e1;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .Post p {
+            font-size: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+
+        .Post small {
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .formulario {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .Post {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <h1>Blog dos Amigos</h1>
+    <header>
+        <h1>HUNTRIXX BLOG</h1>
+        <p>Compartilhe ideias com seus amigos</p>
+    </header>
 
-    <input id="chave" type="password" placeholder="Chave secreta">
-    <br><br>
+    <div class="formulario">
 
-    <input id="titulo" placeholder="Título do post">
-    <br><br>
+        <input id="chave" type="password" placeholder="Chave secreta">
 
-    <textarea id="conteudo" placeholder="Escreva algo..." rows="5" cols="40"></textarea>
-    <br><br>
+        <input id="autor" placeholder="Seu nome">
 
-    <button onclick="publicar()">Publicar</button>
+        <input id="titulo" placeholder="Título do post">
 
-    <hr>
+        <textarea
+            id="conteudo"
+            placeholder="O que você quer compartilhar hoje?"
+            rows="6"></textarea>
+
+        <button onclick="publicar()">
+            Publicar
+        </button>
+
+    </div>
 
     <div id="posts"></div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+        import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 
         import {
             getFirestore,
@@ -40,7 +171,9 @@
             getDocs,
             query,
             orderBy
-        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        }
+        from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
 
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
@@ -51,70 +184,120 @@
             appId: "1:207651890154:web:2619523aff9ae6175f8893"
         };
 
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+
         const CHAVE = "HUNTRIXX2026";
 
+
         window.publicar = async function () {
-            const chave = document.getElementById("chave").value;
+
+            const chave =
+                document.getElementById("chave").value;
 
             if (chave !== CHAVE) {
                 alert("Chave incorreta!");
                 return;
             }
 
-            const titulo = document.getElementById("titulo").value.trim();
-            const conteudo = document.getElementById("conteudo").value.trim();
 
-            if (!titulo || !conteudo) {
+            const autor =
+                document.getElementById("autor")
+                .value.trim();
+
+            const titulo =
+                document.getElementById("titulo")
+                .value.trim();
+
+            const conteudo =
+                document.getElementById("conteudo")
+                .value.trim();
+
+
+            if (!autor || !titulo || !conteudo) {
                 alert("Preencha todos os campos.");
                 return;
             }
 
-            await addDoc(collection(db, "posts"), {
-                titulo,
-                conteudo,
-                data: new Date().toISOString()
-            });
+
+            await addDoc(
+                collection(db, "posts"),
+                {
+                    autor,
+                    titulo,
+                    conteudo,
+                    data: new Date().toISOString()
+                }
+            );
+
 
             alert("Post publicado!");
 
-            location.reload();
+
+            document.getElementById("autor").value = "";
+            document.getElementById("titulo").value = "";
+            document.getElementById("conteudo").value = "";
+
+
+            carregarPosts();
         };
 
+
         async function carregarPosts() {
+
             const q = query(
                 collection(db, "posts"),
                 orderBy("data", "desc")
             );
 
+
             const snapshot = await getDocs(q);
 
-            const div = document.getElementById("posts");
+            const div =
+                document.getElementById("posts");
 
             div.innerHTML = "";
 
+
             snapshot.forEach(doc => {
+
                 const post = doc.data();
 
-                const dataFormatada = post.data
-                    ? new Date(post.data).toLocaleString("pt-BR")
+
+                const dataFormatada =
+                    post.data
+                    ? new Date(post.data)
+                        .toLocaleString("pt-BR")
                     : "Data desconhecida";
 
+
                 div.innerHTML += `
-                    <article class = "Post">
+                    <article class="Post">
+
                         <h2>${post.titulo}</h2>
+
+                        <span class="autor">
+                            Por ${post.autor || "Anônimo"}
+                        </span>
+
                         <p>${post.conteudo}</p>
-                        <small>${dataFormatada}</small>
-                        <hr>
+
+                        <small>
+                            ${dataFormatada}
+                        </small>
+
                     </article>
                 `;
             });
         }
 
+
         carregarPosts();
+
     </script>
 
 </body>
 </html>
+```
